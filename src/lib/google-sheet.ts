@@ -1,8 +1,5 @@
 import crypto from "node:crypto";
-import fs from "node:fs";
-import path from "node:path";
 
-const KEY_FILE = "n8n-automation-frido-8d9d62043482.json";
 const SPREADSHEET_ID = "1AWMJSw6BHI34nfab50LN3sepnv5sHvu5h-V_rRHJJJA";
 const SHEET_TITLE = "Aadoro - Frido Stock Report";
 
@@ -12,8 +9,13 @@ type Token = { value: string; expiresAt: number };
 
 let tokenCache: Token | null = null;
 
-function keyPath(): string {
-  return path.join(process.cwd(), KEY_FILE);
+function serviceAccount(): { clientEmail: string; privateKey: string } {
+  const clientEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL?.trim();
+  const privateKey = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n").trim();
+  if (!clientEmail || !privateKey) {
+    throw new Error("Set GOOGLE_SERVICE_ACCOUNT_EMAIL and GOOGLE_PRIVATE_KEY in .env.local.");
+  }
+  return { clientEmail, privateKey };
 }
 
 function signJwt(clientEmail: string, privateKey: string): string {
@@ -36,14 +38,7 @@ function signJwt(clientEmail: string, privateKey: string): string {
 async function accessToken(): Promise<string> {
   if (tokenCache && tokenCache.expiresAt > Date.now() + 60_000) return tokenCache.value;
 
-  const file = keyPath();
-  if (!fs.existsSync(file)) {
-    throw new Error(`Could not find the service account key at ${file}.`);
-  }
-  const key = JSON.parse(fs.readFileSync(file, "utf8")) as { client_email?: string; private_key?: string };
-  if (!key.client_email || !key.private_key) {
-    throw new Error("The service account key is missing client_email or private_key.");
-  }
+  const key = serviceAccount();
 
   const response = await fetch("https://oauth2.googleapis.com/token", {
     method: "POST",
@@ -51,7 +46,7 @@ async function accessToken(): Promise<string> {
     cache: "no-store",
     body: new URLSearchParams({
       grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
-      assertion: signJwt(key.client_email, key.private_key),
+      assertion: signJwt(key.clientEmail, key.privateKey),
     }),
   });
   const body = (await response.json()) as { access_token?: string; error?: string; error_description?: string };

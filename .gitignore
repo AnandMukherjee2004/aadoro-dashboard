@@ -6,3 +6,5 @@ out
 next-env.d.ts
 _stock_preview.json
 n8n-automation-frido-8d9d62043482.json
+.env
+.env*.local
