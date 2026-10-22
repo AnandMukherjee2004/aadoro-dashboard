@@ -219,7 +219,7 @@ export function StockReport({ data }: { data: StockData }) {
   }
 
   return (
-    <div className="flex h-dvh flex-col overflow-hidden bg-canvas text-ink md:pl-[76px] print:h-auto print:overflow-visible">
+    <div className="min-h-screen bg-canvas text-ink md:pl-[76px] lg:flex lg:h-dvh lg:flex-col lg:overflow-hidden print:h-auto print:overflow-visible">
       <aside className="no-print fixed inset-y-0 left-0 z-20 hidden w-[76px] flex-col items-center gap-2 py-5 md:flex">
         <RailButton label="All stock" active={status === "all" && family === "all"} onClick={() => applyStatus("all")}>
           <IconGrid />
@@ -235,7 +235,7 @@ export function StockReport({ data }: { data: StockData }) {
         </RailButton>
       </aside>
 
-      <div className="mx-auto flex min-h-0 w-full max-w-[1440px] flex-1 flex-col gap-4 px-4 py-4 sm:px-6 sm:py-5">
+      <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-4 px-4 py-4 sm:px-6 sm:py-5 lg:min-h-0 lg:flex-1">
         <header className="flex shrink-0 flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <Image
@@ -279,8 +279,8 @@ export function StockReport({ data }: { data: StockData }) {
           </div>
         </header>
 
-        <div className="flex min-h-0 flex-1 flex-col gap-4 xl:grid xl:grid-cols-[minmax(0,1fr)_300px] xl:grid-rows-[auto_minmax(0,1fr)]">
-          <div className="grid min-h-0 shrink gap-4 overflow-y-auto md:grid-cols-3 xl:col-start-1 xl:row-start-1 xl:shrink-0 xl:overflow-visible">
+        <div className="flex flex-col gap-4 lg:grid lg:min-h-0 lg:flex-1 lg:grid-cols-[minmax(0,1fr)_300px] lg:grid-rows-[auto_minmax(0,1fr)]">
+          <div className="grid shrink-0 gap-4 md:grid-cols-3 lg:col-start-1 lg:row-start-1">
             <article className="flex min-h-[210px] flex-col rounded-[22px] bg-night p-5 text-white">
               <p className="text-sm font-medium text-white/70">On hand</p>
               <p className="mt-2 text-4xl font-semibold tracking-tight tabular-nums">{formatQty(totals.available)}</p>
@@ -320,7 +320,7 @@ export function StockReport({ data }: { data: StockData }) {
             </article>
           </div>
 
-          <aside className="flex min-h-0 shrink flex-col gap-4 overflow-y-auto xl:col-start-2 xl:row-span-2 xl:row-start-1">
+          <aside className="flex flex-col gap-4 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:min-h-0 lg:overflow-y-auto">
             <section className="rounded-[22px] bg-card p-5 shadow-sm">
               <div className="flex items-center justify-between">
                 <h2 className="text-sm font-semibold">By category</h2>
@@ -378,7 +378,7 @@ export function StockReport({ data }: { data: StockData }) {
             </section>
           </aside>
 
-          <section className="flex min-h-[220px] min-w-0 flex-1 flex-col rounded-[22px] bg-card shadow-sm xl:col-start-1 xl:row-start-2">
+          <section className="flex min-w-0 flex-col rounded-[22px] bg-card shadow-sm lg:col-start-1 lg:row-start-2 lg:min-h-0">
             <div className="relative z-20 flex shrink-0 flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
               <div>
                 <h2 className="text-base font-semibold">Ready available in WH</h2>

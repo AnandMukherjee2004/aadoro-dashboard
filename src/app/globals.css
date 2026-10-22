@@ -18,8 +18,14 @@ html,
 body {
   background: var(--color-canvas);
   color: var(--color-ink);
-  height: 100%;
-  overflow: hidden;
+}
+
+@media (min-width: 1024px) {
+  html,
+  body {
+    height: 100%;
+    overflow: hidden;
+  }
 }
 
 ::selection {
