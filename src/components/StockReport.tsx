@@ -90,12 +90,6 @@ export function StockReport({ data }: { data: StockData }) {
     return map;
   }, [data.purchases, data.sales]);
 
-  const health = useMemo(() => {
-    const next = { healthy: 0, low: 0, out: 0 };
-    for (const product of data.products) next[stockStatus(product.available)] += 1;
-    return next;
-  }, [data.products]);
-
   const weeks = useMemo(() => {
     const map = new Map<string, { purchased: number; sold: number }>();
     function add(date: string | null, key: "purchased" | "sold", qty: number) {
@@ -174,8 +168,23 @@ export function StockReport({ data }: { data: StockData }) {
 
   const stockouts = data.products.filter((product) => product.available <= 0);
   const period = formatPeriod(data.period.from, data.period.to);
-  const healthyShare = data.products.length ? Math.round((health.healthy / data.products.length) * 100) : 0;
-  const tightShare = 100 - healthyShare;
+  const dilution = useMemo(() => {
+    let aadoro = 0;
+    let frido = 0;
+    for (const line of data.sales) {
+      const poc = line.salesPoc.trim().toLowerCase();
+      if (poc === "aadoro") aadoro += line.qty;
+      else if (poc === "frido") frido += line.qty;
+    }
+    const sold = aadoro + frido;
+    const aadoroShare = sold ? Math.round((aadoro / sold) * 100) : 0;
+    return {
+      aadoro,
+      frido,
+      aadoroShare,
+      fridoShare: sold ? 100 - aadoroShare : 0,
+    };
+  }, [data.sales]);
 
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
@@ -298,14 +307,23 @@ export function StockReport({ data }: { data: StockData }) {
               <p className="text-sm font-medium text-black/70">Sale qty</p>
               <p className="mt-2 text-4xl font-semibold tracking-tight tabular-nums">{formatQty(totals.sold)}</p>
               <p className="mt-1 text-xs text-black/60">{data.sales.length} invoice lines</p>
-              <div className="mt-4 flex h-[72px] overflow-hidden rounded-2xl text-[11px] font-semibold">
-                <div className="flex min-w-0 flex-col justify-end bg-white px-3 py-2 text-black" style={{ width: `${healthyShare}%` }}>
-                  <span className="text-base leading-none">{healthyShare}%</span>
-                  <span className="mt-1 text-[10px] font-medium text-ink/70">Healthy</span>
+              <div className="mt-auto">
+                <div
+                  className="flex h-3 overflow-hidden rounded-full bg-night"
+                  role="img"
+                  aria-label={`Stock dilution. Aadoro ${dilution.aadoroShare} percent, Frido ${dilution.fridoShare} percent.`}
+                >
+                  <div className="h-full bg-white" style={{ width: `${Math.min(dilution.aadoroShare * 4, 100)}%` }} />
                 </div>
-                <div className="flex min-w-0 flex-col justify-end bg-night px-3 py-2 text-white" style={{ width: `${tightShare}%` }}>
-                  <span className="text-base leading-none">{tightShare}%</span>
-                  <span className="mt-1 text-[10px] font-medium text-white/70">Low or out</span>
+                <div className="mt-2 flex justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-base font-semibold leading-none tabular-nums">{dilution.aadoroShare}%</p>
+                    <p className="mt-1 text-[10px] font-medium text-black/70">Aadoro · {formatQty(dilution.aadoro)}</p>
+                  </div>
+                  <div className="min-w-0 text-right">
+                    <p className="text-base font-semibold leading-none tabular-nums">{dilution.fridoShare}%</p>
+                    <p className="mt-1 text-[10px] font-medium text-black/70">Frido · {formatQty(dilution.frido)}</p>
+                  </div>
                 </div>
               </div>
             </article>
@@ -762,7 +780,10 @@ function SkuPanel({
                     {sample && <span className="ml-2 rounded-full bg-sun px-1.5 py-0.5 text-[10px] font-semibold uppercase text-black">Sample</span>}
                   </p>
                   <p className="truncate text-xs text-muted">{line.customer || "Customer not recorded"}</p>
-                  <p className="text-xs text-muted">{line.invoice || "No invoice number"}</p>
+                  <p className="text-xs text-muted">
+                    {line.invoice || "No invoice number"}
+                    {line.salesPoc ? ` · ${line.salesPoc}` : ""}
+                  </p>
                 </div>
                 <p className="font-semibold tabular-nums">{formatQty(line.qty)}</p>
               </li>

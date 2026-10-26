@@ -25,6 +25,7 @@ export type PurchaseLine = {
 export type SaleLine = {
   date: string | null;
   customer: string;
+  salesPoc: string;
   invoice: string;
   sku: string;
   qty: number;

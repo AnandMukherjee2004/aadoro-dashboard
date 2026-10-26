@@ -3,7 +3,7 @@ import crypto from "node:crypto";
 const SPREADSHEET_ID = "1AWMJSw6BHI34nfab50LN3sepnv5sHvu5h-V_rRHJJJA";
 const SHEET_TITLE = "Aadoro - Frido Stock Report";
 
-const RANGES = ["Purchase!A:I", "Sales!A:H", "'Ready Available in WH'!A:G"] as const;
+const RANGES = ["Purchase!A:I", "Sales!A:I", "'Ready Available in WH'!A:G"] as const;
 
 type Token = { value: string; expiresAt: number };
 

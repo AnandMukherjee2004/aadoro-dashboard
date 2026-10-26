@@ -93,15 +93,16 @@ export async function loadStock(): Promise<StockData> {
 
   const sales: SaleLine[] = [];
   for (const row of rowsOf(sheets, "Sales")) {
-    const sku = asText(row[5]);
+    const sku = asText(row[6]);
     if (!sku || sku.toLowerCase() === "item name" || sku.toLowerCase() === "total") continue;
     sales.push({
       date: asIsoDate(row[2]),
       customer: asText(row[3]),
-      invoice: asText(row[4]),
+      salesPoc: asText(row[4]),
+      invoice: asText(row[5]),
       sku,
-      qty: asQty(row[6]),
-      remarks: asText(row[7]),
+      qty: asQty(row[7]),
+      remarks: asText(row[8]),
     });
   }
 
