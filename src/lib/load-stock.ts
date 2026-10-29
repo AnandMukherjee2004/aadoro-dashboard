@@ -29,13 +29,6 @@ function asHsn(value: unknown): string {
   return text.endsWith(".0") ? text.slice(0, -2) : text;
 }
 
-function asGstPercent(value: unknown): number | null {
-  if (typeof value !== "number" || !Number.isFinite(value)) return null;
-  if (value > 1 && value < 2) return Math.round((value - 1) * 10000) / 100;
-  if (value >= 0 && value <= 100) return value;
-  return null;
-}
-
 /**
  * Date columns are Excel serials. SheetJS date objects land just before
  * local midnight here (11 Sep becomes 10 Sep 23:59), so convert the serial
@@ -85,9 +78,9 @@ export async function loadStock(): Promise<StockData> {
       vendor: asText(row[3]),
       bill: asText(row[4]),
       sku,
-      gstPercent: asGstPercent(row[6]),
-      qty: asQty(row[7]),
-      remarks: asText(row[8]),
+      gstPercent: null,
+      qty: asQty(row[6]),
+      remarks: asText(row[7]),
     });
   }
 
